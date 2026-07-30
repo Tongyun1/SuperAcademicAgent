@@ -30,9 +30,9 @@
 
 感谢核心贡献者：
 
-- [@CYFang6](https://github.com/CYFang6)
 - [@yihengjingWHU](https://github.com/yihengjingWHU)
 - [@YukiNagisame](https://github.com/YukiNagisame)
+- [@CYFang6](https://github.com/CYFang6)
 
 ---
 
