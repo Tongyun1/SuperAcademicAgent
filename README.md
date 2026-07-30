@@ -64,6 +64,12 @@ AI 浪潮下论文呈指数级增长——一个细分方向半年就能冒出�
 
 ---
 
+## 示例
+
+[`examples/opsd_view.html`](examples/opsd_view.html) — 查询 "on-policy self-distillation for LLMs" 的完整报纸式产出，下载后双击即可查看。
+
+---
+
 ## 快速开始
 
 ### 1. 安装（Python 3.12+）
@@ -215,12 +221,6 @@ open ./examples/opsd_view.html
 | `/help` | 完整帮助 |
 | `Ctrl+O` | 展开/折叠工具输出详情 |
 | `Ctrl+C` | 中断当前任务 / 退出 |
-
----
-
-## 示例
-
-[`examples/opsd_view.html`](examples/opsd_view.html) — 查询 "on-policy self-distillation for LLMs" 的完整报纸式产出，下载后双击即可查看。
 
 ---
 
