@@ -26,6 +26,15 @@
 
 ---
 
+## 致谢
+
+感谢两位核心贡献者：
+
+- [@CYFang6](https://github.com/CYFang6)
+- [@yihengjingWHU](https://github.com/yihengjingWHU)
+
+---
+
 ## 为什么做这个
 
 AI 浪潮下论文呈指数级增长——一个细分方向半年就能冒出几十篇新工作。对想进入新领域的人：
