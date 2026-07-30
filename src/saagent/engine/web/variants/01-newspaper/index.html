@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Field Gazette — Newspaper edition</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,400&family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;500;600&display=swap">
+    <script src="https://unpkg.com/vis-network@9.1.6/dist/vis-network.min.js" defer></script>
+    <script src="../shared/helpers.js" defer></script>
+    <script src="./app.js" defer></script>
+</head>
+<body class="np">
+
+<header class="np-mast">
+    <div class="np-mast__row">
+        <span class="np-mast__brand">SuperAcademicAISearch</span>
+        <span class="np-mast__date" id="np-date">—</span>
+        <button class="np-lang" id="np-lang" type="button" aria-label="Switch language">中文</button>
+    </div>
+</header>
+
+<nav class="np-toc" aria-label="Sections">
+    <div class="np-toc__inner">
+        <a href="#brief" class="np-toc__a is-active">In Brief</a>
+        <a href="#seed" class="np-toc__a">Your Paper</a>
+        <a href="#founding" class="np-toc__a">Founding</a>
+        <a href="#stages" class="np-toc__a">Stages</a>
+        <a href="#roadmap" class="np-toc__a">Roadmap</a>
+        <a href="#apparatus" class="np-toc__a">Apparatus</a>
+        <a href="#network" class="np-toc__a">Network</a>
+    </div>
+</nav>
+
+<main class="np-page">
+
+    <!-- HEADLINE -->
+    <section class="np-headline">
+        <div class="np-kicker" id="np-kicker">FIELD TRACE</div>
+        <h1 class="np-h1" id="np-title">—</h1>
+        <p class="np-deck" id="np-deck"></p>
+        <div class="np-byline">
+            <span id="np-byline-stats">—</span>
+        </div>
+    </section>
+
+    <!-- IN BRIEF (TLDR + sidebar stats) -->
+    <section id="brief" class="np-section np-brief">
+        <div class="np-section__hd">
+            <span class="np-section__num">I</span>
+            <h2 class="np-section__title">In Brief</h2>
+            <span class="np-section__sub">A one-minute orientation</span>
+        </div>
+        <div class="np-brief__grid">
+            <article class="np-brief__main">
+                <div class="np-brief__tldr-label">The Story</div>
+                <p class="np-brief__tldr" id="np-tldr"></p>
+                <blockquote class="np-pullquote" id="np-core-idea"></blockquote>
+            </article>
+            <aside class="np-brief__side">
+                <div class="np-side__block">
+                    <div class="np-side__label">By the numbers</div>
+                    <dl class="np-side__stats" id="np-stats"></dl>
+                </div>
+                <div class="np-side__block">
+                    <div class="np-side__label">Must read</div>
+                    <ol class="np-side__must" id="np-must"></ol>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- SEED PAPER (the paper the user actually asked about) -->
+    <section id="seed" class="np-section np-seed" hidden>
+        <div class="np-section__hd">
+            <span class="np-section__num">II</span>
+            <h2 class="np-section__title" id="np-seed-title">The paper you asked about</h2>
+            <span class="np-section__sub" id="np-seed-sub"></span>
+        </div>
+        <article class="np-seed__card" id="np-seed-card"></article>
+    </section>
+
+    <!-- FOUNDING -->
+    <section id="founding" class="np-section np-found">
+        <div class="np-section__hd">
+            <span class="np-section__num">III</span>
+            <h2 class="np-section__title">Founding works</h2>
+            <span class="np-section__sub">Where it all began</span>
+        </div>
+        <div class="np-found__grid" id="np-found-grid"></div>
+    </section>
+
+    <!-- STAGES -->
+    <section id="stages" class="np-section np-stages">
+        <div class="np-section__hd">
+            <span class="np-section__num">IV</span>
+            <h2 class="np-section__title">Stages of the field</h2>
+            <span class="np-section__sub">How the lineage unfolded</span>
+        </div>
+        <div class="np-stages__list" id="np-stages-list"></div>
+    </section>
+
+    <!-- ROADMAP TABLE -->
+    <section id="roadmap" class="np-section np-roadmap">
+        <div class="np-section__hd">
+            <span class="np-section__num">V</span>
+            <h2 class="np-section__title">The roadmap</h2>
+            <span class="np-section__sub">Key papers, in order</span>
+        </div>
+        <table class="np-rm-table" id="np-rm-table">
+            <thead>
+                <tr>
+                    <th class="np-rm-th-year">Year</th>
+                    <th class="np-rm-th-role">Role</th>
+                    <th class="np-rm-th-title">Title</th>
+                    <th class="np-rm-th-contrib">Contribution</th>
+                    <th class="np-rm-th-cite">Cites</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <!-- READING APPARATUS (4 cards) -->
+    <section id="apparatus" class="np-section np-app">
+        <div class="np-section__hd">
+            <span class="np-section__num">VI</span>
+            <h2 class="np-section__title">Reading apparatus</h2>
+            <span class="np-section__sub">For the complete beginner</span>
+        </div>
+        <div class="np-app__grid">
+            <article class="np-app__card">
+                <div class="np-app__label">Prerequisites</div>
+                <ul class="np-app__prereq" id="np-prereq"></ul>
+            </article>
+            <article class="np-app__card">
+                <div class="np-app__label">Getting started</div>
+                <ol class="np-app__start" id="np-start"></ol>
+            </article>
+            <article class="np-app__card">
+                <div class="np-app__label">Reading path</div>
+                <ol class="np-app__path" id="np-path"></ol>
+            </article>
+            <article class="np-app__card">
+                <div class="np-app__label">Open problems</div>
+                <ul class="np-app__gaps" id="np-gaps"></ul>
+            </article>
+        </div>
+    </section>
+
+    <!-- NETWORK -->
+    <section id="network" class="np-section np-net">
+        <div class="np-section__hd">
+            <span class="np-section__num">VII</span>
+            <h2 class="np-section__title">Citation network</h2>
+            <span class="np-section__sub">Node size ∝ PageRank · double-click to open paper</span>
+        </div>
+        <div class="np-net__legend" id="np-net-legend">
+            <span class="np-legend__item"><span class="np-legend__line np-legend__line--blue"></span> 该节点引用的论文（出边）</span>
+            <span class="np-legend__item"><span class="np-legend__line np-legend__line--orange"></span> 引用该节点的论文（入边）</span>
+            <span class="np-legend__item"><span class="np-legend__dot np-legend__dot--seed"></span> 你查询的论文</span>
+            <span class="np-legend__item"><span class="np-legend__dot np-legend__dot--must"></span> 必读论文</span>
+        </div>
+        <div class="np-net__frame" id="np-net-frame"></div>
+        <div class="np-net__index" id="np-net-index"></div>
+    </section>
+
+    <footer class="np-colophon">
+        <b>SuperAcademicAISearch</b> · Newspaper edition · typeset in Playfair Display + Source Serif 4 + JetBrains Mono · derived from <code>result.json</code> · Apache-2.0
+    </footer>
+
+</main>
+
+<div id="np-error" class="np-error" hidden></div>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+[project]
+name = "saagent"
+version = "0.1.0"
+description = "SuperAcademic research agent — self-contained Stirrup-driven agent loop (vendored engine at saagent.engine)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "stirrup[all]==0.1.11",  # pinned for reproducibility
+    "anthropic>=0.60",
+    "json-repair>=0.30",
+    "python-dotenv>=1.0",
+    # vendored engine (saagent.engine) runtime deps — previously provided by the
+    # separate SuperAcademicAISearch install; now declared here for self-containment.
+    "httpx>=0.27",
+    "networkx>=3.0",
+    "pydantic>=2.0",
+    "typer>=0.12",
+    "rich>=13.0",
+    "pymupdf>=1.24",
+    "prompt_toolkit>=3.0",
+]
+
+[project.scripts]
+saagent = "saagent.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

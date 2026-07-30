@@ -1,0 +1,993 @@
+/* ============================================================
+   SuperAcademicAISearch · Annotated Edition
+   --
+   Visual thesis: an academic monograph rendered for the web,
+   with AI reasoning surfaced as scholar's marginalia.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+    /* ---- paper & ink ----------------------------------------------------- */
+    --paper:        #F7F3EA;     /* warm aged paper, slightly more yellow than the AI-default cream */
+    --paper-deep:   #EFE8D5;     /* slightly darker for inset blocks */
+    --ink:          #1A1814;     /* printer's black, never #000 */
+    --ink-soft:     #5B5448;     /* pencil-grey footnote tone */
+    --ink-faint:    #8B816F;     /* dateline / breadcrumb */
+    --rule:         #C8BFAA;     /* oxidised hairline */
+    --rule-soft:    #E1D8C2;
+
+    /* ---- accents (used sparingly) ---------------------------------------- */
+    --accent:       #8B2A1F;     /* vermilion — the editor's seal; founding role, must-read */
+    --accent-deep:  #6B1F17;
+    --marginalia:   #1F4068;     /* Prussian blue — only on the AI annotation rail */
+    --marginalia-soft: #4D6B91;
+
+    /* ---- role swatches (citation network legend, footnote markers) ------ */
+    --role-founding:     var(--accent);
+    --role-breakthrough: #B85C2F;
+    --role-improvement:  #3F6B47;
+    --role-branch:       #1F4068;
+    --role-survey:       #6B4F8B;
+    --role-normal:       #9A9080;
+
+    /* ---- type roles ------------------------------------------------------ */
+    --display: 'Source Serif 4', 'Sectra', Georgia, 'Times New Roman', serif;
+    --body:    'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --mono:    'JetBrains Mono', 'iA Writer Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* ---- spacing scale (modular, based on 8) ----------------------------- */
+    --s-1: 4px;
+    --s-2: 8px;
+    --s-3: 12px;
+    --s-4: 20px;
+    --s-5: 32px;
+    --s-6: 52px;
+    --s-7: 84px;
+    --s-8: 136px;
+
+    /* ---- layout ---------------------------------------------------------- */
+    --measure: 68ch;             /* body column width */
+    --gutter-wide: 240px;        /* outer margin where footnote numerals live */
+    --rail: 360px;               /* marginalia drawer */
+}
+
+/* =============================================================
+   Reset & defaults
+   ============================================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.7;
+    font-feature-settings: 'kern', 'liga', 'onum';
+    /* a faint paper grain so it doesn't read as flat HTML */
+    background-image:
+        radial-gradient(rgba(91, 84, 72, 0.025) 1px, transparent 1px),
+        radial-gradient(rgba(91, 84, 72, 0.018) 1px, transparent 1px);
+    background-size: 3px 3px, 7px 7px;
+    background-position: 0 0, 1px 2px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+::selection { background: var(--accent); color: var(--paper); }
+
+a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+    transition: border-color 120ms, color 120ms;
+}
+a:hover, a:focus-visible { color: var(--accent); border-bottom-color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 1px; }
+
+button {
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+}
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* =============================================================
+   Masthead (running head of a journal)
+   ============================================================= */
+
+.masthead {
+    border-bottom: 2px solid var(--ink);
+    padding: var(--s-3) var(--s-5);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-4);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+.masthead__title b { color: var(--ink); letter-spacing: 0.12em; }
+.masthead__meta { display: flex; gap: var(--s-4); align-items: baseline; }
+.masthead__meta span::before { content: '·'; margin-right: var(--s-3); color: var(--rule); }
+.masthead__meta span:first-child::before { content: none; }
+
+.lang-toggle {
+    margin-left: var(--s-3);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border: 1px solid var(--rule);
+    padding: 4px 10px;
+    background: transparent;
+    transition: border-color 120ms, color 120ms;
+}
+.lang-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.lang-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* =============================================================
+   Page frame
+   ============================================================= */
+
+.page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: var(--s-7) var(--s-5) var(--s-8);
+    position: relative;
+}
+
+@media (max-width: 760px) {
+    .page { padding: var(--s-6) var(--s-4) var(--s-7); }
+    .masthead { padding: var(--s-3) var(--s-4); flex-wrap: wrap; }
+}
+
+/* =============================================================
+   Cover (the thesis: editorial nameplate + foundations callout)
+   ============================================================= */
+
+.cover {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) 1fr minmax(280px, 4fr);
+    gap: 0 var(--s-5);
+    align-items: start;
+    padding-bottom: var(--s-6);
+    border-bottom: 1px solid var(--rule);
+}
+.cover__main { grid-column: 1; }
+.cover__aside { grid-column: 3; padding-top: 6px; }
+
+.cover__eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: var(--s-4);
+}
+.cover__eyebrow .sep { color: var(--rule); margin: 0 var(--s-2); }
+.cover__eyebrow em {
+    font-style: normal;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 2px 7px;
+    border-radius: 999px;
+    margin-left: var(--s-2);
+    font-size: 10.5px;
+}
+
+.cover__title {
+    font-family: var(--display);
+    font-size: clamp(44px, 6.4vw, 78px);
+    line-height: 0.95;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin: 0 0 var(--s-4);
+    color: var(--ink);
+    /* deliberate hard hyphenation control */
+    overflow-wrap: break-word;
+}
+/* the clamp() above only tracks viewport width, not text length — a topic can be a
+   full disambiguated sentence rather than a short phrase, and would otherwise be
+   forced into a 44-78px band regardless of how long it is. Length tiers set by JS
+   (see wrapTitle's caller) scale the band down so long titles stay legible. */
+.cover__title--long { font-size: clamp(28px, 4.2vw, 52px); line-height: 1.05; }
+.cover__title--xlong { font-size: clamp(20px, 2.8vw, 34px); line-height: 1.15; }
+.cover__title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink-soft);
+}
+
+.cover__blurb {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    max-width: 32ch;
+    margin: 0 0 var(--s-5);
+    font-weight: 300;
+}
+
+.cover__stats {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-4);
+    text-transform: uppercase;
+}
+.cover__stats b {
+    color: var(--ink);
+    font-weight: 600;
+    margin-right: 6px;
+    font-size: 13px;
+}
+
+/* Foundations callout — like a frontispiece engraving */
+.foundations {
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: var(--s-4) 0;
+}
+.foundations__label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: var(--s-3);
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+}
+.foundations__label::before, .foundations__label::after {
+    content: '';
+    flex: 0 0 18px;
+    height: 1px;
+    background: var(--accent);
+}
+.foundations__label::after { flex: 1; }
+.foundations__list { list-style: none; padding: 0; margin: 0; }
+.foundations__item {
+    padding: var(--s-2) 0;
+    border-bottom: 1px dotted var(--rule);
+    font-size: 14.5px;
+    line-height: 1.4;
+}
+.foundations__item:last-child { border-bottom: 0; }
+.foundations__num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    margin-right: 8px;
+    letter-spacing: 0.05em;
+}
+.foundations__title { color: var(--ink); }
+.foundations__meta {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+}
+
+@media (max-width: 760px) {
+    .cover { grid-template-columns: 1fr; }
+    .cover__aside { grid-column: 1; padding-top: var(--s-4); }
+    .cover__title { font-size: 52px; }
+}
+
+/* =============================================================
+   Section headings (§ I, § II, ... — proper monograph chapters)
+   ============================================================= */
+
+.section { margin-top: var(--s-7); }
+
+.section__head {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    align-items: baseline;
+    gap: var(--s-4);
+    margin-bottom: var(--s-4);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--ink);
+}
+.section__num {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding-top: 8px;
+}
+.section__num span { display: block; color: var(--accent); margin-top: 2px; }
+
+.section__title {
+    font-family: var(--display);
+    font-size: clamp(26px, 3.4vw, 36px);
+    line-height: 1.1;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+.section__period {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    display: block;
+    margin-top: 6px;
+    text-transform: uppercase;
+}
+
+/* =============================================================
+   Abstract block (narrative, drop cap, double column where width allows)
+   ============================================================= */
+
+.abstract {
+    margin-top: var(--s-5);
+    padding: var(--s-5) 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+}
+.abstract__label {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: var(--s-3);
+}
+.abstract__body {
+    font-family: var(--display);
+    font-size: 19px;
+    line-height: 1.65;
+    color: var(--ink);
+    max-width: var(--measure);
+}
+.abstract__body::first-letter {
+    font-family: var(--display);
+    font-size: 4.6em;
+    line-height: 0.85;
+    float: left;
+    padding: 6px 10px 0 0;
+    font-weight: 500;
+    color: var(--accent);
+}
+
+/* =============================================================
+   Stage chapter: headline + summary + time spine + paper cards
+   ============================================================= */
+
+.stage { margin-top: var(--s-6); padding-top: var(--s-4); }
+.stage + .stage { border-top: 1px dashed var(--rule-soft); }
+
+.stage__headline {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 24px;
+    line-height: 1.3;
+    font-weight: 400;
+    color: var(--ink);
+    max-width: 38ch;
+    margin: var(--s-3) 0 var(--s-3);
+}
+.stage__summary {
+    color: var(--ink-soft);
+    max-width: var(--measure);
+    margin: 0 0 var(--s-5);
+    font-size: 16px;
+}
+
+/* The time spine: a horizontal hairline, year ticks, paper cards docked beneath */
+.spine {
+    position: relative;
+    margin: var(--s-5) 0 var(--s-4);
+    padding: var(--s-4) 0 var(--s-2);
+}
+.spine__line {
+    position: absolute;
+    top: 28px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--ink);
+}
+.spine__ticks {
+    position: relative;
+    height: 32px;
+    display: flex;
+    justify-content: space-between;
+}
+.spine__tick {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    padding-top: 14px;
+    text-align: center;
+}
+.spine__tick::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 8px;
+    background: var(--ink);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+}
+@media (min-width: 1100px) {
+    .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.card {
+    position: relative;
+    padding: var(--s-3) var(--s-3) var(--s-3) calc(var(--s-3) + 4px);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-left-width: 3px;
+    border-left-color: var(--role-normal);
+    transition: border-color 120ms, transform 120ms;
+}
+.card:hover { border-color: var(--ink); }
+.card[data-role="founding"]    { border-left-color: var(--role-founding); }
+.card[data-role="breakthrough"]{ border-left-color: var(--role-breakthrough); }
+.card[data-role="improvement"] { border-left-color: var(--role-improvement); }
+.card[data-role="branch"]      { border-left-color: var(--role-branch); }
+.card[data-role="survey"]      { border-left-color: var(--role-survey); }
+
+.card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.card__year {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+}
+.card__role {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+.card__role[data-role="founding"] { color: var(--role-founding); }
+.card__title {
+    font-family: var(--display);
+    font-size: 15.5px;
+    line-height: 1.35;
+    color: var(--ink);
+    margin: 0 0 6px;
+    font-weight: 500;
+}
+.card__contribution {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    font-style: italic;
+}
+.card__cites {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    margin-top: var(--s-2);
+    letter-spacing: 0.04em;
+}
+.card__cites b { color: var(--ink-soft); font-weight: 500; }
+
+/* =============================================================
+   Reading path & must-read
+   ============================================================= */
+
+.cols-2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s-6);
+}
+@media (max-width: 760px) {
+    .cols-2 { grid-template-columns: 1fr; gap: var(--s-5); }
+}
+
+.must {
+    list-style: none;
+    padding: 0;
+    margin: var(--s-4) 0 0;
+}
+.must__item {
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--rule-soft);
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+}
+.must__item:last-child { border-bottom: 0; }
+.must__star {
+    color: var(--accent);
+    font-size: 14px;
+    line-height: 1;
+}
+.must__title {
+    font-family: var(--display);
+    font-size: 17px;
+    color: var(--ink);
+    line-height: 1.35;
+}
+.must__year {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.05em;
+}
+.must__reason {
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.55;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+.path {
+    list-style: none;
+    padding: 0;
+    margin: var(--s-4) 0 0;
+    counter-reset: pathstep;
+}
+.path__item {
+    counter-increment: pathstep;
+    padding: var(--s-3) 0 var(--s-3) 48px;
+    border-bottom: 1px solid var(--rule-soft);
+    position: relative;
+}
+.path__item:last-child { border-bottom: 0; }
+.path__item::before {
+    content: counter(pathstep, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: var(--s-3);
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+}
+.path__title {
+    font-family: var(--display);
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.4;
+}
+.path__year {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    margin-left: 6px;
+    letter-spacing: 0.05em;
+}
+
+/* =============================================================
+   Gaps (open problems) — set apart as marginal notes
+   ============================================================= */
+
+.gaps {
+    list-style: none;
+    padding: 0;
+    margin: var(--s-4) 0 0;
+}
+.gap {
+    padding: var(--s-3) 0 var(--s-3) 36px;
+    position: relative;
+    border-bottom: 1px solid var(--rule-soft);
+    font-family: var(--display);
+    font-size: 17.5px;
+    line-height: 1.55;
+    color: var(--ink);
+}
+.gap:last-child { border-bottom: 0; }
+.gap::before {
+    content: '※';
+    position: absolute;
+    left: 0;
+    top: calc(var(--s-3) + 4px);
+    color: var(--accent);
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* =============================================================
+   Citation index (the appendix list)
+   ============================================================= */
+
+.index {
+    margin-top: var(--s-6);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--ink);
+    columns: 2;
+    column-gap: var(--s-5);
+}
+@media (max-width: 760px) { .index { columns: 1; } }
+.index__item {
+    break-inside: avoid;
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--rule);
+    font-size: 13.5px;
+    line-height: 1.4;
+}
+.index__id {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    margin-right: 8px;
+}
+.index__title { color: var(--ink); }
+.index__meta {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+}
+
+/* =============================================================
+   Network appendix (only when reader explicitly expands)
+   ============================================================= */
+
+details.network {
+    margin-top: 0;
+    border-top: 0;
+    padding-top: 0;
+}
+details.network summary {
+    cursor: pointer;
+    list-style: none;
+    display: none;            /* default-open; collapse control is implicit */
+}
+details.network summary::-webkit-details-marker { display: none; }
+.network__frame {
+    width: 100%;
+    height: 540px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    margin-top: var(--s-3);
+}
+
+.network__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: center;
+    margin-top: var(--s-3);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+.legend__swatch {
+    display: inline-block;
+    width: 18px;
+    height: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+.legend__hint {
+    margin-left: auto;
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-faint);
+}
+
+.card__tag {
+    font-family: var(--mono);
+    color: var(--accent);
+    font-weight: 500;
+}
+
+/* =============================================================
+   Marginalia drawer — the AI's annotations
+   ============================================================= */
+
+.rail-toggle {
+    position: fixed;
+    right: var(--s-4);
+    bottom: var(--s-5);
+    z-index: 50;
+    background: var(--marginalia);
+    color: var(--paper);
+    padding: var(--s-3) var(--s-4);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-radius: 0;
+    border: 1px solid var(--marginalia);
+    box-shadow: 0 6px 18px rgba(31, 64, 104, 0.18);
+    transition: transform 140ms ease, background 140ms;
+}
+.rail-toggle:hover { transform: translateY(-2px); }
+.rail-toggle__count {
+    background: var(--paper);
+    color: var(--marginalia);
+    padding: 1px 6px;
+    margin-left: 8px;
+    font-weight: 600;
+}
+
+.rail {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--rail);
+    background: #FBF8F0;
+    border-left: 1px solid var(--marginalia);
+    transform: translateX(105%);
+    transition: transform 240ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -18px 0 48px rgba(26, 24, 20, 0.08);
+}
+.rail.open { transform: translateX(0); }
+
+.rail__head {
+    padding: var(--s-4) var(--s-4);
+    border-bottom: 1px solid var(--marginalia);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.rail__title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--marginalia);
+}
+.rail__title b {
+    color: var(--marginalia);
+    font-weight: 600;
+    border-bottom: 1px solid var(--marginalia);
+    padding-bottom: 1px;
+}
+.rail__sub {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--marginalia-soft);
+    text-transform: none;
+    letter-spacing: 0;
+}
+.rail__close {
+    color: var(--marginalia);
+    font-size: 18px;
+    line-height: 1;
+    padding: 6px;
+}
+
+.trace {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--s-3) var(--s-4) var(--s-5);
+    list-style: none;
+    margin: 0;
+}
+.trace__item {
+    position: relative;
+    padding: var(--s-3) 0 var(--s-3) var(--s-4);
+    border-bottom: 1px dotted var(--marginalia-soft);
+    font-family: var(--display);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--marginalia);
+}
+.trace__item:last-child { border-bottom: 0; }
+.trace__item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 22px;
+    width: 8px;
+    height: 1px;
+    background: var(--marginalia);
+}
+.trace__head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--marginalia-soft);
+}
+.trace__agent { color: var(--marginalia); font-weight: 600; }
+.trace__type { font-style: italic; text-transform: lowercase; letter-spacing: 0.04em; }
+.trace__caption {
+    font-style: italic;
+    color: var(--marginalia);
+}
+.trace__detail {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--marginalia-soft);
+    font-style: normal;
+    word-break: break-word;
+}
+
+.trace__item--verify { background: rgba(31, 64, 104, 0.04); margin: 0 -16px; padding-left: 32px; padding-right: 16px; }
+.trace__item--verify::before { background: var(--accent); }
+.trace__item--self_correct { background: rgba(139, 42, 31, 0.05); margin: 0 -16px; padding-left: 32px; padding-right: 16px; color: var(--accent); }
+.trace__item--self_correct::before { background: var(--accent); }
+.trace__item--finish::before, .trace__item--consistency::before { background: var(--role-improvement); }
+
+.rail__empty {
+    padding: var(--s-5) var(--s-4);
+    font-family: var(--display);
+    font-style: italic;
+    color: var(--marginalia-soft);
+    font-size: 14px;
+}
+
+/* When rail is open on wide screens, gently shift the page so it doesn't hide behind */
+@media (min-width: 1280px) {
+    body.rail-open .page { transform: translateX(calc(-1 * var(--rail) / 2.5)); transition: transform 240ms; }
+}
+
+@media (max-width: 760px) {
+    .rail { width: 100%; }
+    .rail-toggle { right: var(--s-3); bottom: var(--s-3); }
+}
+
+/* =============================================================
+   Footer colophon
+   ============================================================= */
+
+.colophon {
+    margin-top: var(--s-7);
+    padding-top: var(--s-4);
+    border-top: 2px solid var(--ink);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--ink-faint);
+    line-height: 1.6;
+    text-transform: uppercase;
+}
+.colophon b { color: var(--ink-soft); }
+
+/* =============================================================
+   Errors / empty state
+   ============================================================= */
+
+.notice {
+    margin: var(--s-7) auto;
+    max-width: 540px;
+    padding: var(--s-5);
+    border: 1px solid var(--accent);
+    background: rgba(139, 42, 31, 0.05);
+    color: var(--accent-deep);
+    font-family: var(--display);
+}
+.notice h2 { margin-top: 0; font-weight: 500; }
+.notice code { font-family: var(--mono); background: rgba(26, 24, 20, 0.06); padding: 2px 5px; }
+
+/* =============================================================
+   Reduced motion
+   ============================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .rail, .rail-toggle, body.rail-open .page, .card { transition: none !important; }
+    html { scroll-behavior: auto; }
+}
+
+/* =============================================================
+   Paper links — quiet by default, scholar's red on hover
+   --
+   Every paper title in the page is a <a class="paper-link"> that
+   opens the underlying arXiv / PDF / DOI / OpenAlex URL in a new
+   tab. We want the visual register of a monograph (no glowing
+   blue web links), so the anchor inherits typography until the
+   pointer arrives — then a dotted vermilion underline and a tiny
+   ↗ glyph announce that it's a hyperlink.
+   ============================================================= */
+
+.paper-link {
+    color: inherit;
+    text-decoration: none;
+    background: transparent;
+    border-bottom: 1px dotted transparent;
+    padding-bottom: 1px;
+    transition: color 120ms ease, border-color 120ms ease;
+    cursor: pointer;
+}
+.paper-link:hover,
+.paper-link:focus-visible {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    outline: none;
+}
+.paper-link:focus-visible {
+    outline: 2px solid rgba(139, 42, 31, 0.35);
+    outline-offset: 2px;
+    border-radius: 1px;
+}
+/* The ↗ glyph stays muted; lights up with the text on hover. */
+.paper-link::after {
+    content: ' ↗';
+    font-family: var(--mono);
+    font-size: 0.72em;
+    color: var(--ink-faint);
+    margin-left: 2px;
+    vertical-align: 0.15em;
+    opacity: 0;
+    transition: opacity 140ms ease, color 140ms ease;
+}
+.paper-link:hover::after,
+.paper-link:focus-visible::after {
+    opacity: 1;
+    color: var(--accent);
+}
+.paper-link:visited { color: inherit; }
+.paper-link:visited:hover { color: var(--accent); }
+
+/* Inert wrapper for papers without any URL — same layout, no affordance. */
+.paper-link--inert,
+.paper-link--inert:hover { color: inherit; border-bottom-color: transparent; cursor: text; }
+.paper-link--inert::after { content: ''; }
+
+/* Inside a stage card the title is an <h3>; the anchor fills that
+   block-level slot so the whole title line stays clickable. */
+.card__title .paper-link { display: inline; }
+.card__title .paper-link::after { vertical-align: 0.1em; }
+.index__item .paper-link { display: inline; }
+
+/* =============================================================
+   Print: closer to the monograph the design imitates
+   ============================================================= */
+
+@media print {
+    body { background: #fff; }
+    .masthead, .rail, .rail-toggle, details.network, .colophon button { display: none !important; }
+    .page { max-width: none; padding: 0 24mm; }
+    .section { break-inside: avoid; }
+    .paper-link, .paper-link:hover { color: inherit; border-bottom-color: transparent; }
+    .paper-link::after { display: none; }
+}

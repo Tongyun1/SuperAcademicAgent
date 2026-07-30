@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="color-scheme" content="light">
+    <title>A Field Trace — SuperAcademicAISearch</title>
+    <link rel="stylesheet" href="./app.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="https://unpkg.com/vis-network@9.1.6/dist/vis-network.min.js" defer></script>
+</head>
+<body>
+
+<header class="masthead">
+    <div class="masthead__title">
+        <span>SuperAcademicAISearch · Vol. 0 No. 1</span>
+        <b>&nbsp;</b>
+    </div>
+    <div class="masthead__meta">
+        <span class="masthead__date">Jun 2026</span>
+        <span class="masthead__sub">An annotated field trace</span>
+        <button class="lang-toggle" aria-label="Switch language">中文</button>
+    </div>
+</header>
+
+<main id="root">
+
+<div class="page">
+
+    <!-- ============ Cover ============ -->
+    <section class="cover">
+        <div class="cover__main">
+            <div class="cover__eyebrow">
+                <span class="field-of">A Field Trace of</span> <span class="sep">·</span>
+                <span class="mode">Agentic edition</span>
+                <em class="llm">LLM analysis</em>
+            </div>
+            <h1 class="cover__title">FIELD TITLE</h1>
+            <p class="cover__blurb"></p>
+            <div class="cover__stats"></div>
+        </div>
+        <aside class="cover__aside">
+            <div class="foundations">
+                <div class="foundations__label">Founding works</div>
+                <ol class="foundations__list"></ol>
+            </div>
+        </aside>
+    </section>
+
+    <!-- ============ Abstract / Narrative ============ -->
+    <section class="abstract" aria-labelledby="abstract-label">
+        <div class="abstract__label" id="abstract-label">Abstract</div>
+        <p class="abstract__body"></p>
+    </section>
+
+    <!-- ============ Stages (rendered by JS) ============ -->
+    <div class="stages"></div>
+
+    <!-- ============ Reading apparatus ============ -->
+    <section class="section section--apparatus">
+        <header class="section__head">
+            <div class="section__num">§ R<span>Apparatus</span></div>
+            <div>
+                <h2 class="section__title">Reading apparatus</h2>
+                <span class="section__period">For the newcomer</span>
+            </div>
+        </header>
+
+        <div class="cols-2" style="margin-top:32px">
+            <div>
+                <div class="abstract__label must-label" style="margin-bottom:8px">Must read</div>
+                <ul class="must"></ul>
+            </div>
+            <div>
+                <div class="abstract__label path-label" style="margin-bottom:8px">Reading path</div>
+                <ol class="path"></ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ Open problems ============ -->
+    <section class="section section--gaps">
+        <header class="section__head">
+            <div class="section__num">§ O<span>Frontier</span></div>
+            <div>
+                <h2 class="section__title">Open problems</h2>
+                <span class="section__period">What is not yet solved</span>
+            </div>
+        </header>
+        <ul class="gaps"></ul>
+    </section>
+
+    <!-- ============ Citation network (interactive) ============ -->
+    <section class="section section--network">
+        <header class="section__head">
+            <div class="section__num">§ N<span>Network</span></div>
+            <div>
+                <h2 class="section__title">Citation network</h2>
+                <span class="section__period">Interactive · node size ∝ PageRank</span>
+            </div>
+        </header>
+        <details class="network" open>
+            <summary>
+                <span>Full citation network · interactive</span>
+            </summary>
+            <div class="network__frame"></div>
+            <div class="network__legend"></div>
+        </details>
+    </section>
+
+    <!-- ============ Citation index ============ -->
+    <section class="section section--index">
+        <header class="section__head">
+            <div class="section__num">§ ⅹ<span>Index</span></div>
+            <div>
+                <h2 class="section__title">Citation index</h2>
+                <span class="section__period">Top 30 by PageRank</span>
+            </div>
+        </header>
+        <div class="index"></div>
+    </section>
+
+    <footer class="colophon">
+        <b>SuperAcademicAISearch</b> · annotated edition · typeset in Source Serif&nbsp;4 + JetBrains&nbsp;Mono ·
+        derived from <code>result.json</code> · open source under Apache 2.0
+    </footer>
+
+</div>
+
+</main>
+
+<!-- ============ Marginalia drawer ============ -->
+<button class="rail-toggle" aria-controls="rail" aria-expanded="false">
+    <span class="rail-toggle__label">Author's notes</span>
+    <span class="rail-toggle__count">—</span>
+</button>
+
+<aside id="rail" class="rail" aria-label="AI reasoning trace">
+    <header class="rail__head">
+        <div class="rail__title">
+            <b>Marginalia</b>
+            <span class="rail__sub">AI reasoning trace</span>
+        </div>
+        <button class="rail__close" aria-label="Close marginalia">×</button>
+    </header>
+    <ol class="trace"></ol>
+</aside>
+
+<script src="./app.js"></script>
+
+</body>
+</html>
