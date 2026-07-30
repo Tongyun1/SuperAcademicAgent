@@ -34,6 +34,7 @@
 - [@YukiNagisame](https://github.com/YukiNagisame)
 - [@CYFang6](https://github.com/CYFang6)
 
+感谢公司对实习生开源项目的支持
 ---
 
 ## 为什么做这个
