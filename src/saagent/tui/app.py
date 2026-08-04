@@ -21,7 +21,6 @@ import itertools
 import shutil
 import time
 from datetime import datetime
-from pathlib import Path
 
 from prompt_toolkit import PromptSession
 from prompt_toolkit.formatted_text import ANSI
@@ -35,6 +34,7 @@ from stirrup import ChatMessage, SystemMessage, UserMessage
 from ..build import build_agent
 from ..context import RunContext, build_context
 from ..engine.cli import _fmt_wall, _short_run_id, _splash, build_run_summary_renderable, console
+from ..naming import default_out_dir
 from ..run_export import finalize_result
 from .ask_user_bridge import PendingQuestion, build_ask_user_tool, resolve_answer, wants_custom_input
 from .logger import ChatAgentLogger, RunawayLoopError
@@ -350,10 +350,10 @@ class ChatSession:
                 "[bold]会话恢复[/bold]\n"
                 "  --continue    自动恢复最近一次会话 (saagent --continue)\n"
                 "  --resume      交互式选择历史会话恢复 (saagent --resume)\n"
-                "  --resume DIR  指定会话目录恢复 (saagent --resume ~/.saagent/sessions/...)\n"
+                "  --resume DIR  指定会话目录恢复 (saagent --resume ~/saagent-results/...)\n"
                 "\n"
                 "[bold]输出[/bold]\n"
-                "  结果默认保存在 ~/.saagent/sessions/<时间戳>/\n"
+                "  结果默认保存在 ~/saagent-results/<研究方向>/\n"
                 "  包含: result.json · view.html · report.md · citation_network.graphml\n"
                 "  精读后: reading_notes.md"
             )
@@ -366,11 +366,12 @@ class ChatSession:
     # Session lifecycle
     # ------------------------------------------------------------------
 
-    def _resolve_out_dir(self) -> str:
+    def _resolve_out_dir(self, query: str = "") -> str:
         if self._args.out:
             return self._args.out
-        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-        return str(Path.home() / ".saagent" / "sessions" / ts)
+        # Name the session dir after the research direction (query slug) so the
+        # result is findable at a glance — e.g. ~/saagent-results/触觉世界模型/
+        return default_out_dir(query or "research")
 
     def _resolve_resume_target(self) -> str | None:
         """Determine session dir to resume from --continue or --resume flags."""
@@ -494,7 +495,7 @@ class ChatSession:
             pass
 
     async def _bootstrap_and_run(self, first_text: str) -> None:
-        out_dir = self._resolve_out_dir()
+        out_dir = self._resolve_out_dir(first_text)
         self._ctx = build_context(
             first_text,
             out_dir=out_dir,

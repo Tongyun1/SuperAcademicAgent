@@ -128,6 +128,11 @@ OPENALEX_API_KEY=你的key    # 免费申请：https://openalex.org/users/me
 S2_API_KEY=你的key           # Semantic Scholar，修正引用数
 ```
 
+**输出目录（可选）：**
+```bash
+SAAS_OUT_DIR=~/my-results    # 默认 ~/saagent-results；结果按研究方向自动建子目录
+```
+
 ### 3. 运行
 
 ```bash
@@ -191,7 +196,7 @@ open ./examples/opsd_view.html
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
 | `query` | 无 | 首个研究问题（可启动后再输入） |
-| `--out DIR` | `~/.saagent/sessions/<时间戳>/` | 会话输出目录 |
+| `--out DIR` | `~/saagent-results/<研究方向>/` | 会话输出目录（可用 `SAAS_OUT_DIR` 换根目录） |
 | `--resume` | — | 恢复上次中断的会话 |
 | `--max-nodes N` | 60 | 引用网络节点上限 |
 | `--max-turns N` | 60 | agent 单轮最大推理步数 |
@@ -203,7 +208,7 @@ open ./examples/opsd_view.html
 
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
-| `--out DIR` | `./results/agent_run` | 结果输出目录 |
+| `--out DIR` | `./results/<研究方向>/`（有 `SAAS_OUT_DIR` 时用其作根） | 结果输出目录 |
 | `--no-ask` | off | 关掉歧义追问，全自动 |
 | `--max-nodes N` | 60 | 引用网络节点上限 |
 | `--depth N` | 2 | 扩图深度（pipeline 模式） |
