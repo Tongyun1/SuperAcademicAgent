@@ -120,35 +120,58 @@ def restore_results(ctx: RunContext, saved: dict) -> None:
     ]
 
 
+def _session_roots() -> list[Path]:
+    """Default session roots, in scan order:
+
+    1. SAAS_OUT_DIR (user-configured output root, if set)
+    2. the built-in non-hidden root (~/saagent-results, query-slug dirs)
+    3. the legacy hidden root (~/.saagent/sessions, timestamp dirs)
+
+    Scans all of them so --resume/--continue keep finding every session even
+    after the user changes SAAS_OUT_DIR.
+    """
+    roots = []
+    env_root = os.environ.get("SAAS_OUT_DIR")
+    if env_root:
+        roots.append(Path(env_root).expanduser())
+    roots.append(Path.home() / "saagent-results")
+    roots.append(Path.home() / ".saagent" / "sessions")  # legacy sessions
+    return roots
+
+
 def list_sessions(base_dir: str | Path | None = None) -> list[dict]:
     """List available sessions sorted by updated_at (newest first).
+
+    Default scans all roots from _session_roots().
 
     Returns list of dicts: {path, query, updated_at, turn_count, node_count}.
     """
     if base_dir is None:
-        base_dir = Path.home() / ".saagent" / "sessions"
-    base_dir = Path(base_dir)
-    if not base_dir.exists():
-        return []
+        base_dirs = _session_roots()
+    else:
+        base_dirs = [Path(base_dir)]
 
     sessions = []
-    for d in base_dir.iterdir():
-        if not d.is_dir():
+    for base_dir in base_dirs:
+        if not base_dir.is_dir():
             continue
-        sf = d / SESSION_FILE
-        if not sf.exists():
-            continue
-        try:
-            data = json.loads(sf.read_text(encoding="utf-8"))
-            sessions.append({
-                "path": str(d),
-                "query": data.get("workspace", {}).get("query", "?"),
-                "updated_at": data.get("updated_at", ""),
-                "turn_count": data.get("turn_count", 0),
-                "node_count": len(data.get("workspace", {}).get("papers", {})),
-            })
-        except (json.JSONDecodeError, KeyError):
-            continue
+        for d in base_dir.iterdir():
+            if not d.is_dir():
+                continue
+            sf = d / SESSION_FILE
+            if not sf.exists():
+                continue
+            try:
+                data = json.loads(sf.read_text(encoding="utf-8"))
+                sessions.append({
+                    "path": str(d),
+                    "query": data.get("workspace", {}).get("query", "?"),
+                    "updated_at": data.get("updated_at", ""),
+                    "turn_count": data.get("turn_count", 0),
+                    "node_count": len(data.get("workspace", {}).get("papers", {})),
+                })
+            except (json.JSONDecodeError, KeyError):
+                continue
 
     sessions.sort(key=lambda s: s["updated_at"], reverse=True)
     return sessions

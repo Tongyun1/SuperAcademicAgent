@@ -17,6 +17,7 @@ from pathlib import Path
 from rich.rule import Rule
 from saagent.engine.cli import _print_run_summary, _short_run_id, _splash, console
 from saagent.engine.export import export_all
+from saagent.naming import default_out_dir
 
 # Cache == raw data (methodology): keep it in a stable, machine-portable location so
 # re-runs never re-hit the API. Overridable via --cache-path or SAAS_CACHE_PATH env.
@@ -92,6 +93,9 @@ async def _run(args: argparse.Namespace) -> int:
     from .build import build_agent
     from .context import build_context
 
+    if args.out is None:
+        env_root = os.environ.get("SAAS_OUT_DIR")
+        args.out = default_out_dir(args.query, root=Path(env_root) if env_root else Path("results"))
     ctx = build_context(
         args.query,
         out_dir=args.out,
@@ -180,6 +184,9 @@ def _run_pipeline(args: argparse.Namespace) -> int:
         return 1
     wall = time.time() - t0
 
+    if args.out is None:
+        env_root = os.environ.get("SAAS_OUT_DIR")
+        args.out = default_out_dir(args.query, root=Path(env_root) if env_root else Path("results"))
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
     try:
@@ -275,7 +282,8 @@ def main(argv: list[str] | None = None) -> int:
 
     run = sub.add_parser("run", help="Run the research agent once on a query (scriptable)")
     run.add_argument("query", help="research direction / paper / fuzzy description / identifier")
-    run.add_argument("--out", default="./results/agent_run", help="output directory for result.json")
+    run.add_argument("--out", default=None,
+                     help="output directory (default: ./results/<research-slug>/, named after the query)")
     run.add_argument("--model", default=None, help="override model slug (default: from .env SAAS_LLM_MODEL)")
     run.add_argument("--max-nodes", type=int, default=60, dest="max_nodes")
     run.add_argument("--depth", type=int, default=2)
@@ -296,7 +304,7 @@ def main(argv: list[str] | None = None) -> int:
     chat.add_argument("--cache-path", default=_DEFAULT_CACHE, dest="cache_path",
                       help=f"SQLite cache path (default: {_DEFAULT_CACHE}; or set SAAS_CACHE_PATH)")
     chat.add_argument("--out", default=None,
-                      help="session output dir (default: ~/.saagent/sessions/<timestamp>/)")
+                      help="session output dir (default: ~/saagent-results/<research-slug>/)")
     chat.add_argument("--lang", choices=["zh", "en"], default="zh",
                       help="language the agent uses to talk to you; default zh")
     chat.add_argument("--no-translate", action="store_true",
